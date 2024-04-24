@@ -8,7 +8,8 @@
     "ava": "ava",
     "test": "npm run ava -timeout=2m",
     "watchLint": "esw . --ext=js --ext=mjs --ignore-path .gitignore --fix --watch",
-    "lint": "eslint . --ext=js --ext=mjs --ignore-path .gitignore --fix"
+    "lint": "eslint . --ext=js --ext=mjs --ignore-path .gitignore --fix",
+    "build": "tsc"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -31,6 +32,7 @@
     "url": "git@github.com:tcollinsworth/axios-cached-dns-resolve.git"
   },
   "devDependencies": {
+    "@types/node": "^20.12.7",
     "ava": "^3.15.0",
     "axios": "^0.27.2",
     "body-parser": "^1.20.2",
@@ -41,7 +43,8 @@
     "eslint-watch": "^8.0.0",
     "esm": "^3.2.25",
     "express": "^4.18.2",
-    "ignore-styles": "^5.0.1"
+    "ignore-styles": "^5.0.1",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "json-stringify-safe": "^5.0.1",

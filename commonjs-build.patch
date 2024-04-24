@@ -1,0 +1,126 @@
+diff --git a/axios-cached-dns-resolve.js b/axios-cached-dns-resolve.ts
+similarity index 92%
+rename from axios-cached-dns-resolve.js
+rename to axios-cached-dns-resolve.ts
+index 66b2f36..4c7e380 100644
+--- a/axios-cached-dns-resolve.js
++++ b/axios-cached-dns-resolve.ts
+@@ -1,11 +1,11 @@
+ /* eslint-disable no-plusplus */
+-import dns from 'dns'
+-import URL from 'url'
+-import net from 'net'
+-import stringify from 'json-stringify-safe'
+-import LRUCache from 'lru-cache'
+-import util from 'util'
+-import { init as initLogger } from './logging.js'
++const dns = require('dns')
++const URL = require('url')
++const net = require('net')
++const stringify = require('json-stringify-safe')
++const LRUCache = require('lru-cache')
++const util = require('util')
++const { init: initLogger } = require('./logging.js')
+ 
+ const dnsResolve = util.promisify(dns.resolve)
+ const dnsLookup = util.promisify(dns.lookup)
+@@ -35,7 +35,7 @@ export const config = {
+ 
+ export const cacheConfig = {
+   max: config.dnsCacheSize,
+-  ttl: (config.dnsTtlMs * config.cacheGraceExpireMultiplier), // grace for refresh
++  ttl: (config.dnsTtlMs as number) * (config.cacheGraceExpireMultiplier as number), // grace for refresh
+ }
+ 
+ export const stats = {
+@@ -64,7 +64,7 @@ export function init() {
+ 
+   startBackgroundRefresh()
+   startPeriodicCachePrune()
+-  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs)
++  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs as number)
+ }
+ 
+ export function reset() {
+@@ -74,12 +74,12 @@ export function reset() {
+ 
+ export function startBackgroundRefresh() {
+   if (backgroundRefreshId) clearInterval(backgroundRefreshId)
+-  backgroundRefreshId = setInterval(backgroundRefresh, config.backgroundScanMs)
++  backgroundRefreshId = setInterval(backgroundRefresh, config.backgroundScanMs as number)
+ }
+ 
+ export function startPeriodicCachePrune() {
+   if (cachePruneId) clearInterval(cachePruneId)
+-  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs)
++  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs as number)
+ }
+ 
+ export function getStats() {
+@@ -225,7 +225,7 @@ function extractAddresses(lookupResp) {
+ function recordError(err, errMesg) {
+   ++stats.errors
+   stats.lastError = err
+-  stats.lastErrorTs = new Date().toISOString()
++  stats.lastErrorTs = Date.now()
+   log.error(err, errMesg)
+ }
+ /* eslint-enable no-plusplus */
+diff --git a/index.js b/index.ts
+similarity index 100%
+rename from index.js
+rename to index.ts
+diff --git a/logging.js b/logging.ts
+similarity index 100%
+rename from logging.js
+rename to logging.ts
+diff --git a/package.json b/package.json
+index ba27fb0..583beb6 100644
+--- a/package.json
++++ b/package.json
+@@ -8,7 +8,8 @@
+     "ava": "ava",
+     "test": "npm run ava -timeout=2m",
+     "watchLint": "esw . --ext=js --ext=mjs --ignore-path .gitignore --fix --watch",
+-    "lint": "eslint . --ext=js --ext=mjs --ignore-path .gitignore --fix"
++    "lint": "eslint . --ext=js --ext=mjs --ignore-path .gitignore --fix",
++    "build": "tsc"
+   },
+   "engines": {
+     "node": ">=14.0.0"
+@@ -31,6 +32,7 @@
+     "url": "git@github.com:tcollinsworth/axios-cached-dns-resolve.git"
+   },
+   "devDependencies": {
++    "@types/node": "^20.12.7",
+     "ava": "^3.15.0",
+     "axios": "^0.27.2",
+     "body-parser": "^1.20.2",
+@@ -41,7 +43,8 @@
+     "eslint-watch": "^8.0.0",
+     "esm": "^3.2.25",
+     "express": "^4.18.2",
+-    "ignore-styles": "^5.0.1"
++    "ignore-styles": "^5.0.1",
++    "typescript": "^5.4.5"
+   },
+   "dependencies": {
+     "json-stringify-safe": "^5.0.1",
+diff --git a/tsconfig.json b/tsconfig.json
+new file mode 100644
+index 0000000..5f9f0b8
+--- /dev/null
++++ b/tsconfig.json
+@@ -0,0 +1,12 @@
++{
++  "compilerOptions": {
++    "target": "ES5",
++    "module": "CommonJS",
++    "outDir": "./dist",
++    "strict": false,
++    "esModuleInterop": true
++  },
++  "include": [
++    "*.ts"
++  ]
++}

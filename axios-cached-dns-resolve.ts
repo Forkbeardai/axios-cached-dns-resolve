@@ -1,11 +1,11 @@
 /* eslint-disable no-plusplus */
-import dns from 'dns'
-import URL from 'url'
-import net from 'net'
-import stringify from 'json-stringify-safe'
-import LRUCache from 'lru-cache'
-import util from 'util'
-import { init as initLogger } from './logging.js'
+const dns = require('dns')
+const URL = require('url')
+const net = require('net')
+const stringify = require('json-stringify-safe')
+const LRUCache = require('lru-cache')
+const util = require('util')
+const { init: initLogger } = require('./logging.js')
 
 const dnsResolve = util.promisify(dns.resolve)
 const dnsLookup = util.promisify(dns.lookup)
@@ -35,7 +35,7 @@ export const config = {
 
 export const cacheConfig = {
   max: config.dnsCacheSize,
-  ttl: (config.dnsTtlMs * config.cacheGraceExpireMultiplier), // grace for refresh
+  ttl: (config.dnsTtlMs as number) * (config.cacheGraceExpireMultiplier as number), // grace for refresh
 }
 
 export const stats = {
@@ -64,7 +64,7 @@ export function init() {
 
   startBackgroundRefresh()
   startPeriodicCachePrune()
-  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs)
+  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs as number)
 }
 
 export function reset() {
@@ -74,12 +74,12 @@ export function reset() {
 
 export function startBackgroundRefresh() {
   if (backgroundRefreshId) clearInterval(backgroundRefreshId)
-  backgroundRefreshId = setInterval(backgroundRefresh, config.backgroundScanMs)
+  backgroundRefreshId = setInterval(backgroundRefresh, config.backgroundScanMs as number)
 }
 
 export function startPeriodicCachePrune() {
   if (cachePruneId) clearInterval(cachePruneId)
-  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs)
+  cachePruneId = setInterval(() => config.cache.purgeStale(), config.dnsIdleTtlMs as number)
 }
 
 export function getStats() {
@@ -225,7 +225,7 @@ function extractAddresses(lookupResp) {
 function recordError(err, errMesg) {
   ++stats.errors
   stats.lastError = err
-  stats.lastErrorTs = new Date().toISOString()
+  stats.lastErrorTs = Date.now()
   log.error(err, errMesg)
 }
 /* eslint-enable no-plusplus */
